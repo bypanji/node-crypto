@@ -1,18 +1,20 @@
-<script lang="ts">
-import { ref } from 'vue';
-
-const source = ref<string>("")
+<script lang="ts" setup>
+const message = ref<string>("")
+const aesKey = ref<string>("")
+const result = ref<string>("")
 const handleEncrypt = async () => {
-    const result = await useFetch("/api/encryptAES", {
+    const response = await useFetch("/api/encryptAES", {
         method: "post",
-        body: source.value
+        body: { message : message.value, key: aesKey.value }
     })
-
-    console.log("ini result", result);
+    if(response.data) {
+        result.value = response.data?.value as string
+    }
 }
 </script>
 <template>
-    <textarea v-model="source" />
-    <button @click="handleEncrypt" />
-    <pre></pre>
+    <textarea v-model="message" />
+    <input v-model="aesKey" />
+    <button @click="handleEncrypt">encrypt</button>
+    <pre>{{ result }}</pre>
 </template>
