@@ -1,14 +1,35 @@
 <script lang="ts" setup>
 const message = ref<string>("")
 const aesKey = ref<string>("")
-const result = ref<string>("")
+
+const encrypted = ref<string>("")
+const decrypted = ref<string>("")
+
 const handleEncrypt = async () => {
-    const response = await useFetch("/api/encryptAES", {
+    const response = await useFetch("/api/aes/encrypt", {
         method: "post",
         body: { message : message.value, key: aesKey.value }
     })
     if(response.data) {
-        result.value = response.data?.value as string
+        encrypted.value = response.data?.value as string
+    }
+}
+const handleDecrypt = async () => {
+    const response = await useFetch("/api/aes/decrypt", {
+        method: "post",
+        body: { message : message.value, key: aesKey.value }
+    })
+    if(response.data) {
+        decrypted.value = response.data?.value as string
+    }
+}
+const sign = async () => {
+    const response = await useFetch("/api/hmac/hash", {
+        method: "post",
+        body: { message : message.value, key: aesKey.value }
+    })
+    if(response.data) {
+        encrypted.value = response.data?.value as string
     }
 }
 </script>
@@ -16,5 +37,7 @@ const handleEncrypt = async () => {
     <textarea v-model="message" />
     <input v-model="aesKey" />
     <button @click="handleEncrypt">encrypt</button>
-    <pre>{{ result }}</pre>
+    <button @click="handleDecrypt">decrypt</button>
+    <pre>{{ encrypted }}</pre>
+    <pre>{{ decrypted }}</pre>
 </template>
