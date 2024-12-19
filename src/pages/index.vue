@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { ref } from 'vue';
+
 const message = ref<string>("")
 const aesKey = ref<string>("")
 
@@ -34,6 +36,7 @@ const sign = async () => {
 }
 </script>
 <template>
+    <p class="text-sky-500">heheheheh</p>
     <textarea v-model="message" />
     <input v-model="aesKey" />
     <button @click="handleEncrypt">encrypt</button>
