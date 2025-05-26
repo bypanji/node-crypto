@@ -3,10 +3,8 @@ import { ref } from 'vue';
 
 const message = ref<string>("")
 const aesKey = ref<string>("")
-
 const encrypted = ref<string>("")
 const decrypted = ref<string>("")
-
 const handleEncrypt = async () => {
     const response = await useFetch("/api/aes/encrypt", {
         method: "post",
@@ -25,14 +23,27 @@ const handleDecrypt = async () => {
         decrypted.value = response.data?.value as string
     }
 }
-const sign = async () => {
-    const response = await useFetch("/api/hmac/hash", {
-        method: "post",
-        body: { message : message.value, key: aesKey.value }
-    })
-    if(response.data) {
-        encrypted.value = response.data?.value as string
-    }
+
+const hashResult = ref<string>()
+const hashSource = "testing string for hash";
+const handleHMAC = async () => {
+  const { data } = await useFetch("/api/hmac/hash", {
+    method: "post",
+    body: hashSource,
+  });
+
+  if (data.value) {
+    hashResult.value = data.value;
+  }
+};
+
+const publicKey = ref<string>()
+const privateKey = ref<string>()
+const generateRsa = async () => {
+    const { data } = await useFetch("/api/rsa/generateRSA");
+
+    publicKey.value = data.value?.publicKey
+    privateKey.value = data.value?.privateKey
 }
 </script>
 <template>
@@ -41,6 +52,11 @@ const sign = async () => {
     <input v-model="aesKey" />
     <button @click="handleEncrypt">encrypt</button>
     <button @click="handleDecrypt">decrypt</button>
-    <pre>{{ encrypted }}</pre>
-    <pre>{{ decrypted }}</pre>
+    <button @click="generateRsa">generate RSA key</button>
+    <button @click="handleHMAC">sign</button>
+    <pre>encrypted : {{ encrypted }}</pre>
+    <pre>decrypted : {{ decrypted }}</pre>
+    <pre>hash : {{ hashResult }}</pre>
+    <pre>publicKey : {{ publicKey }}</pre>
+    <pre>privateKey : {{ privateKey }}</pre>
 </template>
