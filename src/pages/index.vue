@@ -25,11 +25,11 @@ const handleDecrypt = async () => {
 }
 
 const hashResult = ref<string>()
-const hashSource = "testing string for hash";
+const hashSource = ref<string>("");
 const handleHMAC = async () => {
   const { data } = await useFetch("/api/hmac/hash", {
     method: "post",
-    body: hashSource,
+    body: {message: hashSource, key: aesKey},
   });
 
   if (data.value) {
@@ -47,9 +47,13 @@ const generateRsa = async () => {
 }
 </script>
 <template>
-    <p class="text-sky-500">heheheheh</p>
+    <p class="text-sky-500">message for aes</p>
     <textarea v-model="message" />
+     <p class="text-sky-500">message for hash</p>
+    <textarea v-model="hashSource" />
+    <p class="text-sky-500">key input</p>
     <input v-model="aesKey" />
+
     <button @click="handleEncrypt">encrypt</button>
     <button @click="handleDecrypt">decrypt</button>
     <button @click="generateRsa">generate RSA key</button>
