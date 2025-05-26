@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
 
 const message = ref<string>("")
 const aesKey = ref<string>("")
@@ -39,11 +38,35 @@ const handleHMAC = async () => {
 
 const publicKey = ref<string>()
 const privateKey = ref<string>()
-const generateRsa = async () => {
+const handleGenerateRsa = async () => {
     const { data } = await useFetch("/api/rsa/generateRSA");
 
     publicKey.value = data.value?.publicKey
     privateKey.value = data.value?.privateKey
+}
+
+//public key for encrypt, private key for decrypt
+const encryptSourceRSA = ref<string>("")
+const encryptResultRSA = ref<string>("")
+const handleEncryptRSA = async () => {
+    const { data } = useFetch("/api/rsa/encryptRSA", {
+        method: "post",
+        body: { message: encryptSourceRSA.value, secretKey: publicKey.value }
+    })
+
+    if(data.value)
+        encryptResultRSA.value = data?.value
+}
+
+const decryptResultRSA = ref<string>("")
+const handleDecryptRSA = async () => {
+    const { data } = useFetch("/api/rsa/decryptRSA", {
+        method: "post",
+        body: { message: encryptResultRSA.value, secretKey: privateKey.value }
+    })
+
+    if(data.value)
+        decryptResultRSA.value = data?.value
 }
 </script>
 <template>
@@ -51,16 +74,22 @@ const generateRsa = async () => {
     <textarea v-model="message" />
      <p class="text-sky-500">message for hash</p>
     <textarea v-model="hashSource" />
+    <p class="text-sky-500">message for RSA</p>
+    <textarea v-model="encryptSourceRSA" />
     <p class="text-sky-500">key input</p>
     <input v-model="aesKey" />
 
     <button @click="handleEncrypt">encrypt</button>
     <button @click="handleDecrypt">decrypt</button>
-    <button @click="generateRsa">generate RSA key</button>
+    <button @click="handleGenerateRsa">generate RSA key</button>
     <button @click="handleHMAC">sign</button>
+    <button @click="handleEncryptRSA">encrypt RSA</button>
+    <button @click="handleDecryptRSA">decrypt RSA</button>
     <pre>encrypted : {{ encrypted }}</pre>
     <pre>decrypted : {{ decrypted }}</pre>
     <pre>hash : {{ hashResult }}</pre>
     <pre>publicKey : {{ publicKey }}</pre>
     <pre>privateKey : {{ privateKey }}</pre>
+    <pre>encrypt RSA : {{ encryptResultRSA }}</pre>
+    <pre>decrypt RSA : {{ decryptResultRSA }}</pre>
 </template>

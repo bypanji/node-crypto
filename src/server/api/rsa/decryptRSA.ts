@@ -3,9 +3,9 @@ import crypto from "node:crypto"
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
-    const { message, key } = body
+    const { message, secretKey } = body
     const decrypt = crypto.privateDecrypt({
-        key: Buffer.from(key),
+        key: Buffer.from(secretKey),
         padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
         oaepHash: "sha256"
     },
@@ -13,5 +13,4 @@ export default defineEventHandler(async (event) => {
     )
 
     return decrypt.toString()
-
 })
